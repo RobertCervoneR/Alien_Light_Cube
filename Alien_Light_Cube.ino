@@ -5,10 +5,7 @@ int redLED = 6;
 int greenLED = 5;
 int blueLED = 3;
 
-int colorCycleDelayTime = 5;
-
 void setup() {
-
 pinMode(colorEffect, INPUT_PULLUP);
 pinMode(changeColor, INPUT_PULLUP);
 pinMode(power, INPUT_PULLUP);
@@ -20,38 +17,61 @@ Serial.begin(9600);
 }
 
 int set_color = "Red";
+int color_strobe_button_is_pressed = false;
 
 void loop() 
 {
   set_color = colorBlink(set_color);
-  
 }
 
+// Idly pulses current color until button press occurs
 int colorBlink(int set_color)
 {
+  // Increasing light
   for(int i = 0; i < 255; i = i + 2)
   {
     color_output(set_color, i);
-
+    // Check for button presses
     int color_change_button_is_pressed = check_if_color_change_pressed();
+    int color_strobe_button_is_pressed = check_if_color_strobe_pressed();
 
+    // If color change button is pressed, changes variable to next color and continues
     if(color_change_button_is_pressed == true)
     {
       set_color = colorChange(set_color);
     }
 
+    // If strobe effect button is pressed, does effect, returns current color, and restarts color pulsing
+    if(color_strobe_button_is_pressed == true)
+    {
+      colorStrobe();
+      return set_color;
+      break;
+    }
+
     delay(10);
   }
 
+  // Decreasing light
   for(int i = 0; i < 255; i = i + 2)
   {
     color_output(set_color, 255 - i);
-
+    // Check for button presses
     int color_change_button_is_pressed = check_if_color_change_pressed();
+    int color_strobe_button_is_pressed = check_if_color_strobe_pressed();
 
+    // If color change button is pressed, changes variable to next color and continues
     if(color_change_button_is_pressed == true)
     {
       set_color = colorChange(set_color);
+    }
+
+    // If strobe effect button is pressed, does effect, returns current color, and restarts color pulsing
+    if(color_strobe_button_is_pressed == true)
+    {
+      colorStrobe();
+      return set_color;
+      break;
     }
     
     delay(10);
@@ -60,6 +80,7 @@ int colorBlink(int set_color)
   return set_color;
 }
 
+// Different pin output combinations for different colors during idle pulsing loops
 void color_output(int set_color, int i)
 {
   if(set_color == "Red")
@@ -115,6 +136,7 @@ int check_if_color_change_pressed()
 
   if(color_change_pressed == 0)
   {
+    // Allows for you to keep pressing button without issue
     while(color_change_pressed == 0)
     {
       color_change_pressed = digitalRead(changeColor);
@@ -126,9 +148,30 @@ int check_if_color_change_pressed()
   {
     return color_change_is_pressed = false;
   }
-
 }
 
+int check_if_color_strobe_pressed()
+{
+  int color_strobe_pressed = digitalRead(colorEffect);
+  int color_strobe_is_pressed;
+
+  if(color_strobe_pressed == 0)
+  {
+    // Allows for you to keep pressing button without issue
+    while(color_strobe_pressed == 0)
+    {
+      color_strobe_pressed = digitalRead(colorEffect);
+      continue;
+    }
+    return color_strobe_is_pressed = true;
+  }
+  else
+  {
+    return color_strobe_is_pressed = false;
+  }
+}
+
+// Change the current color setting while idling
 int colorChange(int set_color)
 {
   if(set_color == "Red")
@@ -159,4 +202,54 @@ int colorChange(int set_color)
   {
     return set_color = "Red";
   }
+}
+
+// Quickly strobes through red, green, and blue, respectively
+void colorStrobe()
+{
+  digitalWrite(redLED, LOW);
+  digitalWrite(greenLED, LOW);
+  digitalWrite(blueLED, LOW);
+
+  int increment = 5;
+
+  for(int i = 0; i < 255; i = i + increment)
+  {
+    analogWrite(redLED, i);
+    delay(10);
+  }
+
+  for(int i = 0; i < 255; i = i + increment)
+  {
+    analogWrite(redLED, 255 - i);
+    delay(10);
+  }
+
+  for(int i = 0; i < 255; i = i + increment)
+  {
+    analogWrite(greenLED, i);
+    delay(10);
+  }
+
+  for(int i = 0; i < 255; i = i + increment)
+  {
+    analogWrite(greenLED, 255 - i);
+    delay(10);
+  }
+
+  for(int i = 0; i < 255; i = i + increment)
+  {
+    analogWrite(blueLED, i);
+    delay(10);
+  }
+
+  for(int i = 0; i < 255; i = i + increment)
+  {
+    analogWrite(blueLED, 255 - i);
+    delay(10);
+  }
+
+  digitalWrite(redLED, LOW);
+  digitalWrite(greenLED, LOW);
+  digitalWrite(blueLED, LOW);
 }
