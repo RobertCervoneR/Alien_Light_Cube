@@ -1,2 +1,2 @@
 # Alien_Light_Cube
-Arduino Stack for the Alien Light Cube 3D printed project.
+All files concerned with the 3D printed Alien Light Cube Project, including stls, Arduino scripts, and more as I add on to this.
