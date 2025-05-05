@@ -1,31 +1,39 @@
+#include <DIYables_IRcontroller.h>
+
 // Button variable names
 int colorEffect = 12;
 int changeColor = 10;
 int tiltSwitch = 8;
 
+// IR Receiver pin
+#define IR_RECEIVER_PIN 2
+
 // LED variable names
 int redLED = 6;
 int greenLED = 5;
-int blueLED = 3;
+int blueLED = 11;
+
+DIYables_IRcontroller_17 irController(IR_RECEIVER_PIN, 200); // debounce time is 200ms
 
 void setup() {
+  irController.begin();
 
-digitalWrite(tiltSwitch, HIGH);
-digitalWrite(redLED, LOW);
-digitalWrite(greenLED, LOW);
-digitalWrite(blueLED, LOW);
+  digitalWrite(tiltSwitch, HIGH);
+  digitalWrite(redLED, LOW);
+  digitalWrite(greenLED, LOW);
+  digitalWrite(blueLED, LOW);
 
-// Button pin types
-pinMode(colorEffect, INPUT_PULLUP);
-pinMode(changeColor, INPUT_PULLUP);
-pinMode(tiltSwitch, INPUT);
+  // Button pin types
+  pinMode(colorEffect, INPUT_PULLUP);
+  pinMode(changeColor, INPUT_PULLUP);
+  pinMode(tiltSwitch, INPUT);
 
-// LED pin types
-pinMode(redLED, OUTPUT);
-pinMode(greenLED, OUTPUT);
-pinMode(blueLED, OUTPUT);
+  // LED pin types
+  pinMode(redLED, OUTPUT);
+  pinMode(greenLED, OUTPUT);
+  pinMode(blueLED, OUTPUT);
 
-Serial.begin(9600);
+  Serial.begin(9600);
 }
 
 int set_color = "Red";
